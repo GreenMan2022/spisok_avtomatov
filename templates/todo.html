@@ -5,43 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ equip.name }}</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-        h1, h2 { color: #2c3e50; }
-        form { margin: 1.5rem 0; }
-        textarea, button { width: 100%; padding: 0.5rem; font-size: 1rem; box-sizing: border-box; }
-        button { background: #3498db; color: white; border: none; cursor: pointer; margin-top: 0.5rem; }
-        button:hover { background: #2980b9; }
-        input[type="radio"] { margin-right: 0.5rem; }
-        label { display: block; margin: 0.3rem 0; }
-        ul { list-style: none; padding: 0; }
-        li { padding: 0.75rem; margin: 0.5rem 0; background: #f9f9f9; border-radius: 4px; }
-        .back { display: inline-block; margin-top: 1.5rem; color: #7f8c8d; text-decoration: none; }
-        .back:hover { text-decoration: underline; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            background-color: #fff;
+            color: #333;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        form {
+            margin: 1rem 0;
+        }
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 0.6rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 0.8rem;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .btn-success {
+            background: #2ecc71;
+        }
+        .btn-success:hover {
+            background: #27ae60;
+        }
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.95em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+        input[type="radio"] {
+            margin-right: 0.5rem;
+        }
+        label {
+            display: block;
+            margin: 0.4rem 0;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            padding: 0.8rem;
+            margin: 0.6rem 0;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
+        .edit-link {
+            color: #f39c12;
+            text-decoration: none;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-top: 0.4rem;
+        }
+        .edit-link:hover {
+            text-decoration: underline;
+        }
+        .back {
+            display: inline-block;
+            margin-top: 1.5rem;
+            color: #7f8c8d;
+            text-decoration: none;
+        }
+        .back:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <h1>🔧 {{ equip.name }}</h1>
 
+    <!-- Кнопка удаления оборудования -->
+    <form method="POST" 
+          action="{{ url_for('delete_equipment_route', equip_id=equip.id) }}"
+          onsubmit="return confirm('Вы уверены, что хотите удалить это оборудование и ВСЕ связанные записи? Это действие нельзя отменить.');"
+          style="display: inline;">
+        <button type="submit" class="btn-delete">🗑️ Удалить оборудование</button>
+    </form>
+    <br><br>
+
     <h2>🔄 Статус оборудования</h2>
-    <form method="POST" action="{{ url_for('update_status_route', equip_id=equip.id) }}" style="margin: 1rem 0;">
+    <form method="POST" action="{{ url_for('update_status_route', equip_id=equip.id) }}">
         <label>
             <input type="radio" name="status" value="исправен" {% if equip.status == 'исправен' %}checked{% endif %}>
             Исправен
         </label>
-        <br>
         <label>
             <input type="radio" name="status" value="неисправен" {% if equip.status == 'неисправен' %}checked{% endif %}>
             Неисправен
         </label>
-        <br><br>
-        <button type="submit" style="background: #2ecc71;">
-            Сохранить статус
-        </button>
+        <br>
+        <button type="submit" class="btn-success">Сохранить статус</button>
     </form>
 
     <h2>➕ Добавить неисправность</h2>
     <form method="POST" action="{{ url_for('add_issue_route', equip_id=equip.id) }}">
-        <textarea name="description" placeholder="Опишите проблему (например: 'Не печатает', 'Шумит вентилятор' и т.д.)" rows="4" required></textarea><br>
+        <textarea name="description" 
+                  placeholder="Опишите проблему (например: 'Не включается', 'Шумит вентилятор', 'Не печатает')" 
+                  rows="4" 
+                  required></textarea>
         <button type="submit">Добавить запись</button>
     </form>
 
@@ -51,7 +138,10 @@
         {% for issue in issues %}
             <li>
                 <strong>{{ issue.description }}</strong>
-                <br><small>Добавлено: {{ issue.created_at }}</small>
+                <br>
+                <small>Добавлено: {{ issue.created_at }}</small>
+                <br>
+                <a href="{{ url_for('edit_issue_route', issue_id=issue.id) }}" class="edit-link">✏️ Редактировать</a>
             </li>
         {% endfor %}
         </ul>
