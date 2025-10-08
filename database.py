@@ -6,7 +6,8 @@ from psycopg2.extras import RealDictCursor
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db_connection():
-    """Создаёт подключение к PostgreSQL."""
+    if not DATABASE_URL:
+        raise RuntimeError("Переменная окружения DATABASE_URL не установлена!")
     return psycopg2.connect(DATABASE_URL, sslmode='require')
 
 def init_db():
