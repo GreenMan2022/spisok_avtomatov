@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Учёт оборудования</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { color: #2c3e50; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 0.75rem; margin: 0.5rem 0; background: #f9f9f9; border-radius: 4px; }
+        a { text-decoration: none; color: #3498db; font-size: 1.1em; }
+        .status-ok { color: green; font-weight: bold; }
+        .status-bad { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>📋 Список оборудования</h1>
+    <ul>
+        {% for item in equipment_list %}
+        <li>
+            <a href="{{ url_for('equipment_detail', equip_id=item.id) }}">
+                {{ item.name }}
+            </a>
+            — 
+            <span class="{% if item.status == 'исправен' %}status-ok{% else %}status-bad{% endif %}">
+                {{ item.status }}
+            </span>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
