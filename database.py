@@ -69,3 +69,13 @@ def add_issue(equip_id, description):
     cursor.execute('UPDATE equipment SET status = "неисправен" WHERE id = ?', (equip_id,))
     conn.commit()
     conn.close()
+
+def update_equipment_status(equip_id, status):
+    """Обновляет статус оборудования."""
+    if status not in ('исправен', 'неисправен'):
+        raise ValueError("Некорректный статус")
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('UPDATE equipment SET status = ? WHERE id = ?', (status, equip_id))
+    conn.commit()
+    conn.close()
