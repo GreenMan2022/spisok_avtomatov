@@ -6,11 +6,13 @@
     <title>{{ equip.name }}</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-        h1 { color: #2c3e50; }
+        h1, h2 { color: #2c3e50; }
         form { margin: 1.5rem 0; }
-        textarea { width: 100%; padding: 0.5rem; font-size: 1rem; }
-        button { background: #3498db; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; }
+        textarea, button { width: 100%; padding: 0.5rem; font-size: 1rem; box-sizing: border-box; }
+        button { background: #3498db; color: white; border: none; cursor: pointer; margin-top: 0.5rem; }
         button:hover { background: #2980b9; }
+        input[type="radio"] { margin-right: 0.5rem; }
+        label { display: block; margin: 0.3rem 0; }
         ul { list-style: none; padding: 0; }
         li { padding: 0.75rem; margin: 0.5rem 0; background: #f9f9f9; border-radius: 4px; }
         .back { display: inline-block; margin-top: 1.5rem; color: #7f8c8d; text-decoration: none; }
@@ -19,15 +21,27 @@
 </head>
 <body>
     <h1>🔧 {{ equip.name }}</h1>
-    <p><strong>Статус:</strong> 
-        <span style="color: {% if equip.status == 'исправен' %}green{% else %}red{% endif %}; font-weight: bold;">
-            {{ equip.status }}
-        </span>
-    </p>
+
+    <h2>🔄 Статус оборудования</h2>
+    <form method="POST" action="{{ url_for('update_status_route', equip_id=equip.id) }}" style="margin: 1rem 0;">
+        <label>
+            <input type="radio" name="status" value="исправен" {% if equip.status == 'исправен' %}checked{% endif %}>
+            Исправен
+        </label>
+        <br>
+        <label>
+            <input type="radio" name="status" value="неисправен" {% if equip.status == 'неисправен' %}checked{% endif %}>
+            Неисправен
+        </label>
+        <br><br>
+        <button type="submit" style="background: #2ecc71;">
+            Сохранить статус
+        </button>
+    </form>
 
     <h2>➕ Добавить неисправность</h2>
     <form method="POST" action="{{ url_for('add_issue_route', equip_id=equip.id) }}">
-        <textarea name="description" placeholder="Опишите проблему (например: 'Не печатает', 'Шумит вентилятор' и т.д.)" rows="4" required></textarea><br><br>
+        <textarea name="description" placeholder="Опишите проблему (например: 'Не печатает', 'Шумит вентилятор' и т.д.)" rows="4" required></textarea><br>
         <button type="submit">Добавить запись</button>
     </form>
 
