@@ -79,3 +79,13 @@ def update_equipment_status(equip_id, status):
     cursor.execute('UPDATE equipment SET status = ? WHERE id = ?', (status, equip_id))
     conn.commit()
     conn.close()
+
+def add_equipment(name):
+    """Добавляет новое оборудование со статусом 'исправен'."""
+    if not name.strip():
+        return
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO equipment (name, status) VALUES (?, ?)', (name.strip(), 'исправен'))
+    conn.commit()
+    conn.close()
