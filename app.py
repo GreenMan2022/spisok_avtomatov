@@ -7,12 +7,14 @@ from database import (
     get_issues_by_equipment_id,
     add_issue,
     update_equipment_status,
-    add_equipment
+    add_equipment,
+    delete_equipment,
+    get_db_connection
 )
+from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
 
-# Инициализация базы при запуске
 init_db()
 
 @app.route('/')
@@ -51,6 +53,34 @@ def add_equipment_route():
         return redirect(url_for('index'))
     return render_template('add_equipment.html')
 
+@app.route('/equipment/<int:equip_id>/delete', methods=['POST'])
+def delete_equipment_route(equip_id):
+    delete_equipment(equip_id)
+    return redirect(url_for('index'))
+
+@app.route('/issue/<int:issue_id>/edit', methods=['GET', 'POST'])
+def edit_issue_route(issue_id):
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute('SELECT * FROM issues WHERE id = %s', (issue_id,))
+    issue = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if not issue:
+        return "Запись не найдена", 404
+
+    equip_id = issue['equipment_id']
+
+    if request.method == 'POST':
+        description = request.form.get('description', '').strip()
+        if description:
+            from database import update_issue
+            update_issue(issue_id, description)
+        return redirect(url_for('equipment_detail', equip_id=equip_id))
+
+    return render_template('edit_issue.html', issue=issue, equip_id=equip_id)
+
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port, debug=False)
