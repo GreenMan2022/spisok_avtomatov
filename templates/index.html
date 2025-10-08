@@ -19,7 +19,7 @@
         }
         .btn-add:hover { background: #27ae60; }
         ul { list-style: none; padding: 0; }
-        li { padding: 0.8rem; margin: 0.6rem 0; background: #f9f9f9; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        li { padding: 0.8rem; margin: 0.6rem 0; background: #f9f9f9; border-radius: 6px; }
         a { text-decoration: none; color: #3498db; font-size: 1.1em; }
         .status-ok { color: green; font-weight: bold; }
         .status-bad { color: red; font-weight: bold; }
@@ -27,9 +27,7 @@
 </head>
 <body>
     <h1>📋 Список оборудования</h1>
-    
     <a href="{{ url_for('add_equipment_route') }}" class="btn-add">➕ Добавить новое устройство</a>
-
     <ul>
         {% for item in equipment_list %}
         <li>
