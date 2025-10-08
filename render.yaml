@@ -3,6 +3,7 @@ services:
     name: equipment-tracker
     env: python
     region: frankfurt
+    runtime: python:3.12  # ← явно указываем версию
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python app.py"
     envVars:
