@@ -2,7 +2,6 @@ import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-# Render автоматически добавит DATABASE_URL при подключении БД
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db_connection():
@@ -11,11 +10,9 @@ def get_db_connection():
     return psycopg2.connect(DATABASE_URL, sslmode='require')
 
 def init_db():
-    """Создаёт таблицы и начальные данные, если их нет."""
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # Таблица оборудования
     cur.execute('''
         CREATE TABLE IF NOT EXISTS equipment (
             id SERIAL PRIMARY KEY,
@@ -24,7 +21,6 @@ def init_db():
         )
     ''')
 
-    # Таблица неисправностей
     cur.execute('''
         CREATE TABLE IF NOT EXISTS issues (
             id SERIAL PRIMARY KEY,
@@ -34,7 +30,6 @@ def init_db():
         )
     ''')
 
-    # Проверяем, есть ли уже данные
     cur.execute('SELECT COUNT(*) FROM equipment')
     if cur.fetchone()[0] == 0:
         cur.executemany(
@@ -103,6 +98,24 @@ def add_equipment(name):
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('INSERT INTO equipment (name, status) VALUES (%s, %s)', (name.strip(), 'исправен'))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def delete_equipment(equip_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('DELETE FROM equipment WHERE id = %s', (equip_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def update_issue(issue_id, description):
+    if not description.strip():
+        return
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('UPDATE issues SET description = %s WHERE id = %s', (description.strip(), issue_id))
     conn.commit()
     cur.close()
     conn.close()
