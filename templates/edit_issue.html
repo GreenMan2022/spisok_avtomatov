@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Редактировать запись</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { color: #2c3e50; }
+        form { margin: 1.5rem 0; }
+        textarea {
+            width: 100%; padding: 0.6rem; font-size: 1rem; box-sizing: border-box;
+            border: 1px solid #ccc; border-radius: 4px; margin-bottom: 1rem;
+        }
+        button {
+            background: #3498db; color: white; border: none; padding: 0.6rem 1.2rem;
+            cursor: pointer; font-size: 1rem; border-radius: 4px;
+        }
+        .back { display: inline-block; margin-top: 1rem; color: #7f8c8d; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>✏️ Редактировать неисправность</h1>
+    <form method="POST">
+        <textarea name="description" rows="5" required>{{ issue.description }}</textarea>
+        <button type="submit">Сохранить</button>
+    </form>
+    <a href="{{ url_for('equipment_detail', equip_id=equip_id) }}" class="back">← Назад</a>
+</body>
+</html>
