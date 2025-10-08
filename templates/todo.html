@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ equip.name }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { color: #2c3e50; }
+        form { margin: 1.5rem 0; }
+        textarea { width: 100%; padding: 0.5rem; font-size: 1rem; }
+        button { background: #3498db; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 0.75rem; margin: 0.5rem 0; background: #f9f9f9; border-radius: 4px; }
+        .back { display: inline-block; margin-top: 1.5rem; color: #7f8c8d; text-decoration: none; }
+        .back:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>🔧 {{ equip.name }}</h1>
+    <p><strong>Статус:</strong> 
+        <span style="color: {% if equip.status == 'исправен' %}green{% else %}red{% endif %}; font-weight: bold;">
+            {{ equip.status }}
+        </span>
+    </p>
+
+    <h2>➕ Добавить неисправность</h2>
+    <form method="POST" action="{{ url_for('add_issue_route', equip_id=equip.id) }}">
+        <textarea name="description" placeholder="Опишите проблему (например: 'Не печатает', 'Шумит вентилятор' и т.д.)" rows="4" required></textarea><br><br>
+        <button type="submit">Добавить запись</button>
+    </form>
+
+    <h2>📝 История неисправностей</h2>
+    {% if issues %}
+        <ul>
+        {% for issue in issues %}
+            <li>
+                <strong>{{ issue.description }}</strong>
+                <br><small>Добавлено: {{ issue.created_at }}</small>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Нет записей о неисправностях.</p>
+    {% endif %}
+
+    <a href="{{ url_for('index') }}" class="back">← Назад к списку оборудования</a>
+</body>
+</html>
