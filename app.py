@@ -45,6 +45,18 @@ def update_status_route(equip_id):
         update_equipment_status(equip_id, status)
     return redirect(url_for('equipment_detail', equip_id=equip_id))
 
+
+@app.route('/add_equipment', methods=['GET', 'POST'])
+def add_equipment_route():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        if name:
+            from database import add_equipment
+            add_equipment(name)
+        return redirect(url_for('index'))
+    return render_template('add_equipment.html')
+
+
 # Запуск приложения (для Render и локального запуска)
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
