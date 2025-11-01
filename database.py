@@ -30,6 +30,16 @@ def init_db():
         )
     ''')
 
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS spare_parts (
+            id SERIAL PRIMARY KEY,
+            equipment_id INTEGER NOT NULL REFERENCES equipment(id) ON DELETE CASCADE,
+            name TEXT NOT NULL,
+            quantity INTEGER NOT NULL CHECK (quantity > 0),
+            purchase_url TEXT
+        )
+    ''')
+
     cur.execute('SELECT COUNT(*) FROM equipment')
     if cur.fetchone()[0] == 0:
         cur.executemany(
@@ -68,6 +78,30 @@ def get_issues_by_equipment_id(equip_id):
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
     cur.execute('SELECT * FROM issues WHERE equipment_id = %s ORDER BY created_at DESC', (equip_id,))
+    result = cur.fetchall()
+    cur.close()
+    conn.close()
+    return result
+
+def get_spare_parts_by_equipment_id(equip_id):
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute('SELECT * FROM spare_parts WHERE equipment_id = %s ORDER BY name', (equip_id,))
+    result = cur.fetchall()
+    cur.close()
+    conn.close()
+    return result
+
+def get_all_spare_parts_summary():
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute('''
+        SELECT name, SUM(quantity) AS total_quantity,
+               STRING_AGG(DISTINCT purchase_url, ', ') FILTER (WHERE purchase_url IS NOT NULL) AS urls
+        FROM spare_parts
+        GROUP BY name
+        ORDER BY name
+    ''')
     result = cur.fetchall()
     cur.close()
     conn.close()
@@ -116,6 +150,41 @@ def update_issue(issue_id, description):
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute('UPDATE issues SET description = %s WHERE id = %s', (description.strip(), issue_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def add_spare_part(equip_id, name, quantity, purchase_url):
+    if not name.strip() or quantity <= 0:
+        return
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        INSERT INTO spare_parts (equipment_id, name, quantity, purchase_url)
+        VALUES (%s, %s, %s, %s)
+    ''', (equip_id, name.strip(), quantity, purchase_url.strip() if purchase_url else None))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def update_spare_part(part_id, name, quantity, purchase_url):
+    if not name.strip() or quantity <= 0:
+        return
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        UPDATE spare_parts
+        SET name = %s, quantity = %s, purchase_url = %s
+        WHERE id = %s
+    ''', (name.strip(), quantity, purchase_url.strip() if purchase_url else None, part_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def delete_spare_part(part_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('DELETE FROM spare_parts WHERE id = %s', (part_id,))
     conn.commit()
     cur.close()
     conn.close()
