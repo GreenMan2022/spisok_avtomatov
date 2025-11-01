@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, abort, send_file
 import io
 import csv
+import os
 from db import (
     init_db, get_all_equipment, get_equipment_by_id, get_issues_by_equipment_id,
     get_spare_parts_by_equipment_id, get_all_spare_parts_summary,
